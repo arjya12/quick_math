@@ -1,0 +1,1532 @@
+<!doctype html>
+<html lang="en" data-simple="true">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quick Maths</title>
+    <meta name="description"
+        content="Practice mental arithmetic with adaptive difficulty, analytics, and a clean, responsive UI." />
+    <style>
+        :root {
+            --bg: #0f1221;
+            --panel: #181c34;
+            --panel-2: #1f2544;
+            --text: #e8ebff;
+            --muted: #a7acd9;
+            --primary: #6d8cff;
+            --primary-600: #5a77f2;
+            --accent: #32d296;
+            --danger: #ff6b6b;
+            --warning: #ffcc66;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --ring: 2px solid rgba(109, 140, 255, 0.6);
+            --focus: 0 0 0 3px rgba(109, 140, 255, 0.35);
+            --good: #2fd27a;
+            --bad: #ff5a6a;
+            --meh: #ffc54d;
+        }
+
+        /* Themes: override variables by data-theme on html */
+        :root[data-theme="simple"] {
+            --bg: #0e1116;
+            --panel: #161a22;
+            --panel-2: #1b2030;
+            --text: #e6e9ef;
+            --muted: #9aa3b2;
+            --primary: #3a7afe;
+            --primary-600: #2e67d9;
+            --accent: #3a7afe;
+            --danger: #ff5a6a;
+            --warning: #ffcc66;
+        }
+
+        :root[data-theme="indigo"] {
+            --bg: #0f1221;
+            --panel: #181c34;
+            --panel-2: #1f2544;
+            --text: #e8ebff;
+            --muted: #a7acd9;
+            --primary: #6d8cff;
+            --primary-600: #5a77f2;
+            --accent: #32d296;
+            --danger: #ff6b6b;
+            --warning: #ffcc66;
+        }
+
+        :root[data-theme="ocean"] {
+            --bg: #071a24;
+            --panel: #0d2230;
+            --panel-2: #123042;
+            --text: #e8fbff;
+            --muted: #a8c7d1;
+            --primary: #2aa3ff;
+            --primary-600: #198ddf;
+            --accent: #18d1b2;
+            --danger: #ff6b81;
+            --warning: #ffd166;
+        }
+
+        :root[data-theme="forest"] {
+            --bg: #0e1a14;
+            --panel: #14261d;
+            --panel-2: #183325;
+            --text: #e8fff2;
+            --muted: #a1cbb6;
+            --primary: #57c785;
+            --primary-600: #43b272;
+            --accent: #6dd6ff;
+            --danger: #ff6b6b;
+            --warning: #ffcc66;
+        }
+
+        :root[data-theme="solar"] {
+            --bg: #15120a;
+            --panel: #1d1a10;
+            --panel-2: #262213;
+            --text: #fff7e8;
+            --muted: #d6c9a8;
+            --primary: #ffb703;
+            --primary-600: #f29d00;
+            --accent: #36d7b7;
+            --danger: #ff6b6b;
+            --warning: #ffd166;
+        }
+
+        [data-contrast="high"] {
+            --bg: #000;
+            --panel: #0b0b0b;
+            --panel-2: #121212;
+            --text: #fff;
+            --muted: #e0e0e0;
+            --primary: #00aaff;
+            --primary-600: #0095dd;
+            --accent: #00ff88;
+            --danger: #ff3355;
+            --warning: #ffd000;
+            --ring: 2px solid #00aaff;
+            --focus: 0 0 0 3px rgba(0, 170, 255, 0.6);
+            --good: #00ff66;
+            --bad: #ff3355;
+            --meh: #ffd000;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(1200px 800px at 80% -100px, rgba(109, 140, 255, 0.18), transparent 60%),
+                radial-gradient(1000px 700px at -20% 10%, rgba(50, 210, 150, 0.12), transparent 60%),
+                var(--bg);
+            color: var(--text);
+            font: 16px/1.35 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px clamp(16px, 4vw, 32px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            box-shadow: var(--shadow);
+        }
+
+        .brand h1 {
+            font-size: 20px;
+            margin: 0;
+            letter-spacing: 0.2px;
+        }
+
+        .brand small {
+            color: var(--muted);
+            display: block;
+            font-size: 12px;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            appearance: none;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: var(--panel);
+            color: var(--text);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: transform .06s ease, background .2s ease, box-shadow .2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.primary {
+            background: linear-gradient(180deg, var(--primary), var(--primary-600));
+        }
+
+        .btn.ghost {
+            background: transparent;
+            outline: var(--ring);
+        }
+
+        .btn.bad {
+            background: linear-gradient(180deg, #ff6b6b, #ff4757);
+        }
+
+        .btn.good {
+            background: linear-gradient(180deg, #32d296, #20bd8e);
+        }
+
+        main {
+            padding: 0 clamp(16px, 4vw, 32px) 24px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 980px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.02));
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius);
+            padding: clamp(14px, 2vw, 18px);
+            box-shadow: var(--shadow);
+        }
+
+        .game {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 16px;
+        }
+
+        .board {
+            display: grid;
+            grid-template-rows: auto auto auto 1fr;
+            gap: 12px;
+        }
+
+        .problem {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(10px, 2vw, 20px);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .num {
+            font-size: clamp(34px, 6vw, 72px);
+        }
+
+        .op {
+            font-size: clamp(30px, 5.5vw, 64px);
+            color: var(--muted);
+        }
+
+        .eq {
+            font-size: clamp(30px, 5.5vw, 64px);
+            color: var(--muted);
+        }
+
+        .answer-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .answer {
+            width: clamp(110px, 22vw, 220px);
+            font-size: clamp(20px, 3.2vw, 28px);
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: var(--panel-2);
+            color: var(--text);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.35);
+        }
+
+        .answer:focus {
+            outline: none;
+            box-shadow: var(--focus);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .timer {
+            display: grid;
+            place-items: center;
+            align-content: center;
+            gap: 8px;
+        }
+
+        .ring {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+
+        .ring svg {
+            position: absolute;
+            inset: 0;
+            transform: rotate(-90deg);
+        }
+
+        .ring .label {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+        }
+
+        .time-remaining {
+            font-size: 20px;
+        }
+
+        .timer small {
+            color: var(--muted);
+        }
+
+        .feedback {
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            min-height: 46px;
+        }
+
+        .feedback.correct {
+            border-color: rgba(50, 210, 150, 0.5);
+            background: linear-gradient(180deg, rgba(50, 210, 150, 0.16), rgba(255, 255, 255, 0.02));
+        }
+
+        .feedback.wrong {
+            border-color: rgba(255, 107, 107, 0.5);
+            background: linear-gradient(180deg, rgba(255, 107, 107, 0.16), rgba(255, 255, 255, 0.02));
+        }
+
+        .feedback.timeout {
+            border-color: rgba(255, 204, 102, 0.6);
+            background: linear-gradient(180deg, rgba(255, 204, 102, 0.16), rgba(255, 255, 255, 0.02));
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        @media (max-width: 700px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stat {
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+        }
+
+        .stat h3 {
+            margin: 0 0 8px;
+            font-size: 14px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .kpi {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .sub {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .bars {
+            display: grid;
+            gap: 10px;
+        }
+
+        .bar {
+            display: grid;
+            gap: 6px;
+        }
+
+        .bar-row {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 0%;
+        }
+
+        .bar small {
+            color: var(--muted);
+        }
+
+        footer {
+            padding: 14px clamp(16px, 4vw, 32px);
+            color: var(--muted);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .shortcut {
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 6px 8px;
+            border-radius: 8px;
+            color: var(--text);
+        }
+
+        /* Visually hidden but accessible */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 1px, 1px);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Settings modal */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .overlay[aria-hidden="false"] {
+            display: grid;
+            place-items: center;
+        }
+
+        .modal {
+            width: min(920px, 92vw);
+            max-height: 92vh;
+            overflow: auto;
+            background: var(--panel-2);
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: var(--shadow);
+            padding: 16px;
+        }
+
+        .modal header {
+            padding: 0 0 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 10px;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 820px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .group {
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+        }
+
+        .group h4 {
+            margin: 0 0 10px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .row label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .row input[type="number"] {
+            width: 100px;
+        }
+
+        .row input,
+        .row select {
+            background: var(--panel-2);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .row input:focus,
+        .row select:focus {
+            outline: none;
+            box-shadow: var(--focus);
+        }
+
+        /* Simple, single-row settings bar */
+        .settings-bar {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+
+        .settings-bar .ctrl {
+            display: inline-flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 6px;
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 6px 8px;
+        }
+
+        .settings-bar .ctrl * {
+            white-space: nowrap;
+        }
+
+        .settings-bar .ctrl label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .settings-bar select,
+        .settings-bar input[type="number"] {
+            background: var(--panel-2);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 6px;
+            padding: 6px 8px;
+        }
+
+        .settings-bar .section-title {
+            color: var(--muted);
+            font-size: 12px;
+            margin-right: 6px;
+        }
+
+        /* Start/Stop bar below input */
+        .startstop {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        /* Center settings bar in the middle */
+        #inline-settings {
+            position: static;
+            margin: 12px auto;
+            max-width: 100%;
+        }
+
+        #inline-settings .settings-bar {
+            justify-content: center;
+        }
+
+        /* Feedback flash */
+        .flash-good {
+            animation: flashGood .6s ease;
+        }
+
+        .flash-bad {
+            animation: flashBad .6s ease;
+        }
+
+        .flash-time {
+            animation: flashTime .6s ease;
+        }
+
+        @keyframes flashGood {
+            from {
+                box-shadow: 0 0 0 0 rgba(50, 210, 150, .35);
+            }
+
+            to {
+                box-shadow: 0 0 0 26px rgba(50, 210, 150, 0);
+            }
+        }
+
+        @keyframes flashBad {
+            from {
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, .35);
+            }
+
+            to {
+                box-shadow: 0 0 0 26px rgba(255, 107, 107, 0);
+            }
+        }
+
+        @keyframes flashTime {
+            from {
+                box-shadow: 0 0 0 0 rgba(255, 204, 102, .4);
+            }
+
+            to {
+                box-shadow: 0 0 0 26px rgba(255, 204, 102, 0);
+            }
+        }
+
+        /* Large text preference */
+        [data-large-text="true"] .num {
+            font-size: clamp(42px, 8vw, 86px);
+        }
+
+        [data-large-text="true"] .op,
+        [data-large-text="true"] .eq {
+            font-size: clamp(34px, 7vw, 80px);
+        }
+
+        [data-large-text="true"] .answer {
+            font-size: clamp(22px, 3.6vw, 32px);
+        }
+
+        /* Simple UI mode: reduce visual noise and extra panels */
+        [data-simple="true"] body {
+            background: var(--bg);
+        }
+
+        [data-simple="true"] .card {
+            background: transparent;
+            box-shadow: none;
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        [data-simple="true"] .btn {
+            box-shadow: none;
+        }
+
+        [data-simple="true"] .grid {
+            grid-template-columns: 1fr;
+        }
+
+        [data-simple="true"] [aria-label="Dashboard"],
+        [data-simple="true"] [aria-label="Results and insights"] {
+            display: none !important;
+        }
+
+        [data-simple="true"] .controls {
+            display: none;
+        }
+
+        /* Show toolbar in simple mode */
+        [data-simple="true"] header .toolbar {
+            display: flex;
+        }
+
+        /* Further simplifications */
+        [data-simple="true"] :root {
+            --radius: 8px;
+            --radius-sm: 6px;
+            --shadow: none;
+        }
+
+        [data-simple="true"] .btn {
+            transition: background .15s ease, color .15s ease;
+        }
+
+        [data-simple="true"] .btn:hover {
+            transform: none;
+        }
+
+        [data-simple="true"] .btn.primary {
+            background: var(--primary);
+        }
+
+        [data-simple="true"] .btn.good {
+            background: var(--accent);
+        }
+
+        [data-simple="true"] .btn.bad {
+            background: var(--danger);
+        }
+
+        [data-simple="true"] .btn.ghost {
+            outline: none;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        [data-simple="true"] .answer {
+            box-shadow: none;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        [data-simple="true"] .feedback {
+            background: transparent;
+        }
+
+        [data-simple="true"] .feedback.correct,
+        [data-simple="true"] .feedback.wrong,
+        [data-simple="true"] .feedback.timeout {
+            background: transparent;
+        }
+
+        /* Timer ring: solid color instead of gradient */
+        [data-simple="true"] #ring {
+            stroke: var(--primary) !important;
+        }
+
+        [data-simple="true"] .ring circle:first-child {
+            stroke: rgba(255, 255, 255, 0.12);
+        }
+    </style>
+</head>
+
+<body>
+    <header></header>
+
+    <main>
+        <div class="grid">
+
+            <section class="card" aria-label="Settings" id="inline-settings">
+                <div class="settings-bar" role="form">
+                    <span class="section-title">Range</span>
+                    <div class="ctrl">
+                        <label><input type="radio" name="difficulty" value="easy"> Easy</label>
+                        <label><input type="radio" name="difficulty" value="medium"> Medium</label>
+                        <label><input type="radio" name="difficulty" value="hard"> Hard</label>
+                        <label><input type="radio" name="difficulty" value="custom"> Custom</label>
+                        <span id="custom-range">
+                            <label>Min <input type="number" id="min-range" min="1" max="9999" value="1"></label>
+                            <label>Max <input type="number" id="max-range" min="2" max="9999" value="10"></label>
+                        </span>
+                    </div>
+
+                    <span class="section-title">Ops</span>
+                    <div class="ctrl">
+                        <label><input type="checkbox" id="op-add" checked> +</label>
+                        <label><input type="checkbox" id="op-sub" checked> −</label>
+                        <label><input type="checkbox" id="op-mul" checked> ×</label>
+                        <label><input type="checkbox" id="op-div" checked> ÷</label>
+                    </div>
+
+                    <span class="section-title">Timer</span>
+                    <div class="ctrl">
+                        <label>
+                            <select id="timer-select" aria-label="Time limit">
+                                <option value="5">5s</option>
+                                <option value="10" selected>10s</option>
+                                <option value="15">15s</option>
+                                <option value="30">30s</option>
+                                <option value="60">60s</option>
+                            </select>
+                        </label>
+                        <label><input type="checkbox" id="adaptive-timing" checked> Adaptive</label>
+                    </div>
+
+
+                </div>
+            </section>
+
+            <section class="card game" aria-label="Game area">
+                <div class="board" id="board">
+                    <div class="problem" aria-live="polite" aria-atomic="true">
+                        <span class="num" id="a">–</span>
+                        <span class="op" id="op">+</span>
+                        <span class="num" id="b">–</span>
+                        <span class="eq">=</span>
+                    </div>
+                    <div class="answer-wrap">
+                        <label for="answer" class="sr-only">Answer</label>
+                        <input id="answer" class="answer" type="text" inputmode="numeric" autocomplete="off"
+                            placeholder="Type answer" aria-label="Your answer" />
+                        <button id="btn-submit" class="btn good" title="Submit (Enter)" type="button">Submit</button>
+                    </div>
+                    <div class="startstop">
+                        <button class="btn primary" id="btn-start" title="Start session (S)"
+                            type="button">Start</button>
+                        <button class="btn bad" id="btn-stop" disabled title="Stop session (S)"
+                            type="button">Stop</button>
+                    </div>
+                    <div class="feedback" id="feedback" aria-live="polite"></div>
+                    <div class="controls">
+                        <span class="shortcut">Enter: Submit</span>
+                        <span class="shortcut">Space: Next</span>
+                        <span class="shortcut">E: Settings</span>
+                        <span class="shortcut">S: Start/Stop</span>
+                        <span class="shortcut">H: High contrast</span>
+                        <span class="shortcut">L: Large text</span>
+                    </div>
+                </div>
+                <aside class="card timer" aria-label="Timer">
+                    <div class="ring" aria-hidden="true">
+                        <svg viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="54" stroke="rgba(255,255,255,0.08)" stroke-width="10"
+                                fill="none" />
+                            <circle id="ring" cx="60" cy="60" r="54" stroke="url(#g)" stroke-width="10" fill="none"
+                                stroke-linecap="round" stroke-dasharray="339.292" stroke-dashoffset="0" />
+                            <defs>
+                                <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="var(--primary)" />
+                                    <stop offset="100%" stop-color="var(--accent)" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div class="label">
+                            <div class="time-remaining" id="time-remaining">0.0s</div>
+                            <small id="time-limit-label">—</small>
+                        </div>
+                    </div>
+                </aside>
+            </section>
+
+
+        </div>
+
+    </main>
+
+
+
+    <!-- Modal removed in favor of inline settings -->
+
+    <script>
+        (function () {
+            "use strict";
+
+            const dom = {
+                a: document.getElementById('a'),
+                b: document.getElementById('b'),
+                op: document.getElementById('op'),
+                answer: document.getElementById('answer'),
+                submit: document.getElementById('btn-submit'),
+                next: document.getElementById('btn-next'),
+                feedback: document.getElementById('feedback'),
+                board: document.getElementById('board'),
+                ring: document.getElementById('ring'),
+                timeRemaining: document.getElementById('time-remaining'),
+                timeLimitLabel: document.getElementById('time-limit-label'),
+                start: document.getElementById('btn-start'),
+                stop: document.getElementById('btn-stop'),
+                score: document.getElementById('score'),
+                accuracy: null,
+                streak: null,
+                bestStreak: null,
+                lastResult: null,
+                avgTime: null,
+                fastTime: null,
+                slowTime: null,
+                barPlus: null,
+                barMinus: null,
+                barTimes: null,
+                barDiv: null,
+                hardCombos: null,
+                mistakePatterns: null,
+                suggestions: null,
+                sessionSummary: null,
+                btnSettings: null,
+                overlay: null,
+                modal: null,
+                btnCloseSettings: null,
+                btnSave: null,
+                btnReset: document.getElementById('btn-reset'),
+                btnSummary: null,
+            };
+
+            const SETTINGS_KEY = 'mm-settings-v1';
+            const PREFS_KEY = 'mm-prefs-v1';
+            const BEST_STREAK_KEY = 'mm-best-streak-v1';
+            const CIRCUMFERENCE = 2 * Math.PI * 54; // r=54
+
+            function preferCryptoRandomInt(min, max) {
+                if (window.crypto && window.crypto.getRandomValues) {
+                    const range = max - min + 1;
+                    if (range <= 0) return min;
+                    const maxUint = 0xffffffff;
+                    const buckets = Math.floor(maxUint / range) * range;
+                    let x = new Uint32Array(1);
+                    do {
+                        window.crypto.getRandomValues(x);
+                    } while (x[0] >= buckets);
+                    return min + (x[0] % range);
+                }
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            function clamp(n, min, max) { return Math.min(Math.max(n, min), max); }
+
+            function formatMs(ms) {
+                const s = ms / 1000;
+                return s < 1 ? s.toFixed(2) + 's' : s.toFixed(1) + 's';
+            }
+
+            function h(tag, props, ...children) {
+                const el = document.createElement(tag);
+                if (props) {
+                    for (const [k, v] of Object.entries(props)) {
+                        if (k === 'class') el.className = v;
+                        else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.substring(2), v);
+                        else if (v === true) el.setAttribute(k, '');
+                        else if (v === false || v == null) {/* skip */ }
+                        else el.setAttribute(k, String(v));
+                    }
+                }
+                for (const c of children) {
+                    if (c == null) continue;
+                    if (typeof c === 'string') el.appendChild(document.createTextNode(c));
+                    else el.appendChild(c);
+                }
+                return el;
+            }
+
+            const SettingsManager = (() => {
+                const els = {
+                    difficulty: Array.from(document.querySelectorAll('input[name="difficulty"]')),
+                    min: document.getElementById('min-range'),
+                    max: document.getElementById('max-range'),
+                    customRangeRow: document.getElementById('custom-range'),
+                    opAdd: document.getElementById('op-add'),
+                    opSub: document.getElementById('op-sub'),
+                    opMul: document.getElementById('op-mul'),
+                    opDiv: document.getElementById('op-div'),
+                    timerSelect: document.getElementById('timer-select'),
+                    timerCustom: null,
+                    adaptiveTiming: document.getElementById('adaptive-timing'),
+                    // prefs removed from UI; maintain values in storage only
+                    prefContrast: { checked: false },
+                    prefLarge: { checked: false },
+                    prefAutoNext: { checked: true },
+                    prefSound: { checked: false },
+                    // theme removed from bar; keep fixed 'simple'
+                    adaptiveDifficulty: document.getElementById('adaptive-difficulty'),
+                };
+
+                const defaults = {
+                    difficulty: 'easy',
+                    min: 1,
+                    max: 10,
+                    ops: { add: true, sub: true, mul: true, div: true },
+                    timer: 10,
+                    adaptiveTiming: true,
+                    prefs: { contrast: false, large: false, autoNext: true, sound: false, theme: 'simple' },
+                    adaptiveDifficulty: true,
+                };
+
+                function load() {
+                    const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null') || defaults;
+                    const prefs = JSON.parse(localStorage.getItem(PREFS_KEY) || 'null') || saved.prefs || defaults.prefs;
+
+                    // apply UI
+                    const diff = saved.difficulty || 'easy';
+                    els.difficulty.forEach(r => r.checked = r.value === diff);
+                    els.min.value = String(saved.min ?? defaults.min);
+                    els.max.value = String(saved.max ?? defaults.max);
+                    els.opAdd.checked = !!(saved.ops?.add ?? true);
+                    els.opSub.checked = !!(saved.ops?.sub ?? true);
+                    els.opMul.checked = !!(saved.ops?.mul ?? true);
+                    els.opDiv.checked = !!(saved.ops?.div ?? true);
+                    if (['5', '10', '15', '30', '60'].includes(String(saved.timer))) {
+                        els.timerSelect.value = String(saved.timer);
+                    } else {
+                        els.timerSelect.value = '10';
+                    }
+                    els.adaptiveTiming.checked = !!(saved.adaptiveTiming ?? true);
+                    // prefs UI removed: keep stored values only
+                    // theme fixed
+                    // suggest difficulty removed
+                    toggleCustomRange();
+                    applyPrefs(prefs);
+                    return get();
+                }
+
+                function applyPrefs(p) {
+                    document.documentElement.setAttribute('data-contrast', p.contrast ? 'high' : 'normal');
+                    document.documentElement.setAttribute('data-large-text', p.large ? 'true' : 'false');
+                    document.documentElement.setAttribute('data-simple', 'true');
+                    document.documentElement.setAttribute('data-theme', 'simple');
+                }
+
+                function get() {
+                    const checked = els.difficulty.find(r => r.checked)?.value || 'easy';
+                    let min = Number(els.min.value), max = Number(els.max.value);
+                    if (checked !== 'custom') {
+                        if (checked === 'easy') { min = 1; max = 10; }
+                        if (checked === 'medium') { min = 1; max = 50; }
+                        if (checked === 'hard') { min = 1; max = 100; }
+                    }
+                    const timerSel = els.timerSelect.value;
+                    const timer = Number(timerSel);
+                    const settings = {
+                        difficulty: checked,
+                        min, max,
+                        ops: { add: els.opAdd.checked, sub: els.opSub.checked, mul: els.opMul.checked, div: els.opDiv.checked },
+                        timer,
+                        adaptiveTiming: els.adaptiveTiming.checked,
+                        adaptiveDifficulty: false,
+                        prefs: { contrast: els.prefContrast.checked, large: els.prefLarge.checked, autoNext: els.prefAutoNext.checked, sound: els.prefSound.checked, theme: 'simple' },
+                    };
+                    return settings;
+                }
+
+                function save() {
+                    const s = get();
+                    localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+                    localStorage.setItem(PREFS_KEY, JSON.stringify(s.prefs));
+                    applyPrefs(s.prefs);
+                    return s;
+                }
+
+                function toggleCustomRange() {
+                    const diff = els.difficulty.find(r => r.checked)?.value || 'easy';
+                    if (!els.customRangeRow) return;
+                    els.customRangeRow.style.display = diff === 'custom' ? 'flex' : 'none';
+                }
+
+                els.difficulty.forEach(r => r.addEventListener('change', toggleCustomRange));
+                // no custom timer behavior
+
+                return { load, save, get, applyPrefs };
+            })();
+
+            function beepOK() { try { if (!audioCtx) return; const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.frequency.value = 740; g.gain.value = 0.0001; o.connect(g).connect(audioCtx.destination); o.start(); g.gain.exponentialRampToValueAtTime(0.05, audioCtx.currentTime + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2); o.stop(audioCtx.currentTime + 0.21); } catch (_) { } }
+            function beepBad() { try { if (!audioCtx) return; const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.frequency.value = 220; g.gain.value = 0.0001; o.connect(g).connect(audioCtx.destination); o.start(); g.gain.exponentialRampToValueAtTime(0.06, audioCtx.currentTime + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3); o.stop(audioCtx.currentTime + 0.31); } catch (_) { } }
+            let audioCtx = null;
+
+            const ProblemGenerator = (() => {
+                function generate(settings) {
+                    const ops = [];
+                    if (settings.ops.add) ops.push('+');
+                    if (settings.ops.sub) ops.push('-');
+                    if (settings.ops.mul) ops.push('×');
+                    if (settings.ops.div) ops.push('÷');
+                    if (ops.length === 0) ops.push('+');
+                    const min = Math.min(settings.min, settings.max);
+                    const max = Math.max(settings.min, settings.max);
+
+                    // 50% chance to create a multi-operation expression for easy/medium/hard
+                    const wantMulti = ['easy', 'medium', 'hard'].includes(settings.difficulty) && Math.random() < 0.5;
+                    if (wantMulti) {
+                        const multi = generateMulti(settings, ops, min, max);
+                        if (multi) return multi; // {expr, ans, op:'M', difficultyScore}
+                    }
+
+                    // Fallback single-op
+                    const op = ops[preferCryptoRandomInt(0, ops.length - 1)];
+                    let a, b, ans;
+                    if (op === '+') {
+                        a = preferCryptoRandomInt(min, max);
+                        b = preferCryptoRandomInt(min, max);
+                        ans = a + b;
+                    } else if (op === '-') {
+                        a = preferCryptoRandomInt(min, max);
+                        b = preferCryptoRandomInt(min, max);
+                        if (a < b) [a, b] = [b, a];
+                        ans = a - b;
+                    } else if (op === '×') {
+                        a = preferCryptoRandomInt(min, max);
+                        b = preferCryptoRandomInt(min, max);
+                        ans = a * b;
+                    } else { // division with integer result
+                        b = preferCryptoRandomInt(min, max);
+                        const q = preferCryptoRandomInt(min, max);
+                        a = b * q; // ensures integer
+                        ans = q;
+                    }
+                    const difficultyScore = computeDifficultyScoreSingle(op, a, b);
+                    return { a, b, op, ans, difficultyScore };
+                }
+
+                function computeDifficultyScoreSingle(op, a, b) {
+                    // Simple heuristic: scale by magnitude and operation weight
+                    const mag = Math.log10(Math.max(10, Math.abs(a))) + Math.log10(Math.max(10, Math.abs(b)));
+                    const opWeight = op === '+' ? 1 : op === '-' ? 1.1 : op === '×' ? 1.4 : 1.6;
+                    return mag * opWeight; // 2..~7
+                }
+
+                function generateMulti(settings, allowedOps, min, max) {
+                    const lenMap = { easy: 2, medium: 3, hard: 4 };
+                    const opsCount = lenMap[settings.difficulty] || 2;
+                    const useAdd = settings.ops.add, useSub = settings.ops.sub, useMul = settings.ops.mul, useDiv = settings.ops.div;
+                    const canPlusMinus = useAdd || useSub;
+                    const canMulDiv = useMul || useDiv;
+                    if (!canPlusMinus && !canMulDiv) return null;
+
+                    const termCount = Math.max(2, Math.min(opsCount + 1, 5));
+                    const terms = [], termExprs = [];
+                    for (let t = 0; t < termCount; t++) {
+                        let val = preferCryptoRandomInt(min, Math.max(min, Math.min(max, 12)));
+                        let expr = String(val);
+                        const remainOps = opsCount - (termCount - 1);
+                        const chainLen = Math.max(1, (t < remainOps ? 2 : 1));
+                        for (let k = 1; k < chainLen; k++) {
+                            const wantMul = useMul && (!useDiv || Math.random() < 0.6);
+                            if (wantMul) {
+                                const m = preferCryptoRandomInt(2, Math.min(12, max));
+                                val = val * m; expr += ` × ${m}`;
+                            } else if (useDiv) {
+                                let divisor = pickDivisorOf(val, 2, Math.min(12, max));
+                                if (!divisor) { const m = preferCryptoRandomInt(2, 5); val *= m; expr += ` × ${m}`; divisor = pickDivisorOf(val, 2, Math.min(12, max)) || 2; }
+                                val = val / divisor; expr += ` ÷ ${divisor}`;
+                            }
+                        }
+                        terms.push(val); termExprs.push(expr);
+                    }
+                    let total = terms[0]; let fullExpr = termExprs[0];
+                    for (let i = 1; i < terms.length; i++) {
+                        let op;
+                        if (canPlusMinus) {
+                            if (useAdd && useSub) op = Math.random() < 0.6 ? '+' : '−';
+                            else op = useAdd ? '+' : '−';
+                        } else op = '+';
+                        if (op === '+') total += terms[i]; else total -= terms[i];
+                        fullExpr += ` ${op} ${termExprs[i]}`;
+                    }
+                    const difficultyScore = Math.log10(Math.max(10, Math.abs(total))) * 1.2 + opsCount * 0.8;
+                    return { expr: fullExpr, ans: total, op: 'M', difficultyScore };
+                }
+
+                function pickDivisorOf(n, minD, maxD) {
+                    n = Math.abs(Math.floor(n));
+                    const divs = [];
+                    for (let d = Math.max(2, minD); d <= Math.max(2, maxD); d++) { if (n % d === 0) divs.push(d); }
+                    if (divs.length === 0) return 0;
+                    return divs[preferCryptoRandomInt(0, divs.length - 1)];
+                }
+
+                return { generate };
+            })();
+
+            const Timer = (() => {
+                class PreciseTimer {
+                    constructor(onTick, onEnd) {
+                        this.onTick = onTick;
+                        this.onEnd = onEnd;
+                        this.running = false;
+                        this.handle = 0;
+                        this.startMs = 0;
+                        this.durationMs = 0;
+                        this.remainingMs = 0;
+                        this.lastNow = 0;
+                    }
+                    start(ms) {
+                        this.stop();
+                        this.running = true;
+                        this.startMs = performance.now();
+                        this.durationMs = ms;
+                        this.remainingMs = ms;
+                        this.loop();
+                    }
+                    loop = () => {
+                        if (!this.running) return;
+                        const now = performance.now();
+                        const elapsed = now - this.startMs;
+                        this.remainingMs = Math.max(0, this.durationMs - elapsed);
+                        this.onTick(this.remainingMs, this.durationMs);
+                        if (this.remainingMs <= 0) {
+                            this.running = false;
+                            this.onEnd();
+                            return;
+                        }
+                        this.handle = requestAnimationFrame(this.loop);
+                    }
+                    stop() {
+                        if (this.handle) cancelAnimationFrame(this.handle);
+                        this.running = false;
+                    }
+                }
+                return { PreciseTimer };
+            })();
+
+            const StatsTracker = (() => {
+                class Stats {
+                    constructor() { this.reset(); }
+                    reset() {
+                        this.total = 0; this.correct = 0; this.streak = 0; this.bestStreak = Number(localStorage.getItem(BEST_STREAK_KEY) || '0');
+                        this.responseTimesMs = []; // correct only
+                        this.fastMs = null; this.slowMs = null;
+                        this.byOp = { '+': { t: 0, c: 0 }, '-': { t: 0, c: 0 }, '×': { t: 0, c: 0 }, '÷': { t: 0, c: 0 }, 'M': { t: 0, c: 0 } };
+                        this.mistakes = new Map(); // key: "op|a|b" value: { count, lastWrong, lastCorrect }
+                        this.mistakeTypes = new Map(); // key: type string, value count
+                    }
+                    recordAttempt(op, correct, timeMs, problem, userAns) {
+                        if (!this.byOp[op]) this.byOp[op] = { t: 0, c: 0 };
+                        this.total++; this.byOp[op].t++;
+                        if (correct) {
+                            this.correct++; this.streak++; this.byOp[op].c++;
+                            this.responseTimesMs.push(timeMs);
+                            this.fastMs = this.fastMs == null ? timeMs : Math.min(this.fastMs, timeMs);
+                            this.slowMs = this.slowMs == null ? timeMs : Math.max(this.slowMs, timeMs);
+                            if (this.streak > this.bestStreak) { this.bestStreak = this.streak; localStorage.setItem(BEST_STREAK_KEY, String(this.bestStreak)); }
+                        } else {
+                            this.streak = 0;
+                            const key = `${op}|${problem.a}|${problem.b}`;
+                            const rec = this.mistakes.get(key) || { count: 0, lastWrong: null, lastCorrect: problem.ans };
+                            rec.count += 1; rec.lastWrong = userAns; this.mistakes.set(key, rec);
+                            const mType = classifyMistake(op, problem, userAns);
+                            this.mistakeTypes.set(mType, (this.mistakeTypes.get(mType) || 0) + 1);
+                        }
+                    }
+                    accuracy() { return this.total ? Math.round((this.correct / this.total) * 100) : 0; }
+                    avgMs() { if (!this.responseTimesMs.length) return null; return this.responseTimesMs.reduce((a, b) => a + b, 0) / this.responseTimesMs.length; }
+                    opAcc(op) { const r = this.byOp[op]; return r.t ? Math.round((r.c / r.t) * 100) : 0; }
+                    topMistakes(limit = 5) {
+                        const items = Array.from(this.mistakes.entries()).map(([k, v]) => ({ k, v }));
+                        items.sort((a, b) => b.v.count - a.v.count);
+                        return items.slice(0, limit);
+                    }
+                    mistakeTypeBreakdown(limit = 5) {
+                        const arr = Array.from(this.mistakeTypes.entries());
+                        arr.sort((a, b) => b[1] - a[1]);
+                        return arr.slice(0, limit);
+                    }
+                }
+
+                function classifyMistake(op, problem, userAns) {
+                    const correct = problem.ans;
+                    const u = Number(userAns);
+                    if (Number.isNaN(u)) return 'non-numeric input';
+                    const delta = u - correct;
+                    if (op === '+' || op === '-') {
+                        if (Math.abs(delta) === 1) return 'off-by-one';
+                        if (Math.sign(delta) !== 0 && Math.sign(delta) === Math.sign(problem.b)) return 'carry/borrow error';
+                        return 'addition/subtraction slip';
+                    }
+                    if (op === '×') {
+                        if (problem.a <= 12 && problem.b <= 12) return 'times-table recall';
+                        if (Math.abs(delta) % problem.a === 0 || Math.abs(delta) % problem.b === 0) return 'partial-product error';
+                        return 'multiplication slip';
+                    }
+                    if (op === '÷') {
+                        if (problem.b <= 12 && problem.ans <= 12) return 'division table recall';
+                        if (u * problem.b === problem.a) return 'transposed factors';
+                        return 'division slip';
+                    }
+                    return 'other';
+                }
+
+                return { Stats };
+            })();
+
+            const UI = (() => {
+                function renderProblem(p) {
+                    if (p.op === 'M' && p.expr) {
+                        // Render multi-op expression compactly in the same slots
+                        dom.a.textContent = p.expr;
+                        dom.b.textContent = '';
+                        dom.op.textContent = '';
+                    } else {
+                        dom.a.textContent = String(p.a);
+                        dom.b.textContent = String(p.b);
+                        dom.op.textContent = p.op;
+                    }
+                }
+                function clearAnswer() {
+                    dom.answer.value = '';
+                    dom.answer.focus();
+                }
+                function setFeedback(type, msg) {
+                    dom.feedback.className = 'feedback' + (type ? ' ' + type : '');
+                    dom.feedback.textContent = msg || '';
+                    if (type === 'correct') { flash('flash-good'); }
+                    if (type === 'wrong') { flash('flash-bad'); }
+                    if (type === 'timeout') { flash('flash-time'); }
+                }
+                function flash(cls) {
+                    dom.board.classList.remove('flash-good', 'flash-bad', 'flash-time');
+                    void dom.board.offsetWidth; // reflow
+                    dom.board.classList.add(cls);
+                }
+                function setTimer(msRemaining, msTotal) {
+                    dom.timeRemaining.textContent = (msRemaining / 1000).toFixed(1) + 's';
+                    const ratio = clamp(msRemaining / msTotal, 0, 1);
+                    // Update SVG attributes directly for compatibility
+                    if (dom.ring && dom.ring.setAttribute) {
+                        dom.ring.setAttribute('stroke-dasharray', String(CIRCUMFERENCE));
+                        dom.ring.setAttribute('stroke-dashoffset', String((1 - ratio) * CIRCUMFERENCE));
+                    } else if (dom.ring && dom.ring.style) {
+                        dom.ring.style.strokeDasharray = String(CIRCUMFERENCE);
+                        dom.ring.style.strokeDashoffset = String((1 - ratio) * CIRCUMFERENCE);
+                    }
+                }
+                function setTimerLimitLabel(seconds) {
+                    dom.timeLimitLabel.textContent = seconds + 's';
+                }
+                // Minimal UI: no-op dashboard/insights renders
+                function updateDashboard(_) { /* no dashboard */ }
+                function renderInsights(_) { /* no insights */ }
+                function renderSuggestions(_) { /* no suggestions */ }
+                function renderSessionSummary(_) { /* no summary */ }
+                return { renderProblem, clearAnswer, setFeedback, setTimer, setTimerLimitLabel, updateDashboard, renderInsights, renderSuggestions, renderSessionSummary };
+            })();
+
+            const GameController = (() => {
+                let settings = SettingsManager.load();
+                let current = null; // {a,b,op,ans,difficultyScore}
+                let timer = null;
+                let sessionActive = false;
+                let problemStartMs = 0;
+                let stats = new StatsTracker.Stats();
+
+                function init() {
+                    UI.setTimer(0, 1000);
+                    UI.setTimerLimitLabel(secondsLimit());
+                    // Inline settings: save on any change
+                    document.getElementById('inline-settings').addEventListener('change', () => {
+                        settings = SettingsManager.save();
+                        UI.setTimerLimitLabel(secondsLimit());
+                    });
+                    dom.btnReset && dom.btnReset.addEventListener('click', resetStats);
+                    if (dom.start) dom.start.addEventListener('click', startSession);
+                    if (dom.stop) dom.stop.addEventListener('click', stopSession);
+                    // Support inline onclick fallbacks
+                    document.addEventListener('mm-start', startSession);
+                    document.addEventListener('mm-stop', stopSession);
+                    // Fallback delegation in case elements are re-rendered
+                    document.addEventListener('click', (e) => {
+                        const t = e.target;
+                        if (!t) return;
+                        if ((t.id === 'btn-start' || (t.closest && t.closest('#btn-start'))) && !sessionActive) {
+                            startSession();
+                        } else if ((t.id === 'btn-stop' || (t.closest && t.closest('#btn-stop'))) && sessionActive) {
+                            stopSession();
+                        }
+                    });
+                    dom.submit.addEventListener('click', submitAnswer);
+                    // no next button in fun mode
+                    document.addEventListener('keydown', onKey);
+                    // No modal listeners in inline mode
+                    if (settings.prefs.sound) ensureAudio();
+                }
+
+                function secondsLimit() { return Math.max(1, Number(settings.timer || 10)); }
+
+                function computeAdaptiveMs(problem) {
+                    const base = secondsLimit() * 1000;
+                    if (!settings.adaptiveTiming) return base;
+                    // Normalize difficulty score roughly into 0..1 by dividing by an expected upper bound (~7)
+                    const norm = clamp(problem.difficultyScore / 7, 0, 1);
+                    const bonus = 0.5 * norm; // up to +50%
+                    return Math.round(base * (1 + bonus));
+                }
+
+                function generateAndRenderProblem() {
+                    current = ProblemGenerator.generate(settings);
+                    UI.renderProblem(current);
+                    UI.clearAnswer();
+                    // Restore countdown per settings
+                    const ms = computeAdaptiveMs(current);
+                    UI.setTimerLimitLabel(Math.round(ms / 1000));
+                    startTimer(ms);
+                    problemStartMs = performance.now();
+                    if (dom.lastResult) dom.lastResult.textContent = '—';
+                }
+
+                function startTimer(ms) {
+                    if (!timer) timer = new Timer.PreciseTimer((rem, tot) => UI.setTimer(rem, tot), onTimeout);
+                    else timer.stop();
+                    // Initialize visual state to full before countdown
+                    UI.setTimer(ms, ms);
+                    timer.start(ms);
+                }
+
+                function onTimeout() {
+                    if (!sessionActive || !current) return;
+                    handleResult(false, 'timeout');
+                }
+
+                function startSession() {
+                    if (sessionActive) return;
+                    sessionActive = true;
+                    stats.reset();
+                    UI.updateDashboard(stats);
+                    dom.start.disabled = true; dom.stop.disabled = false;
+                    if (dom.next) dom.next.disabled = true; dom.submit.disabled = false;
+                    generateAndRenderProblem();
+                }
+
+                function stopSession() {
+                    if (!sessionActive) return;
+                    sessionActive = false;
+                    if (timer) timer.stop();
+                    dom.start.disabled = false; dom.stop.disabled = true;
+                    dom.submit.disabled = true; if (dom.next) dom.next.disabled = false;
+                    UI.renderSessionSummary(stats);
+                }
+
+                function parseInputValue() {
+                    const raw = dom.answer.value.trim();
+                    if (!raw) return null;
+                    // Allow negative numbers; restrict to integer inputs
+                    if (!/^[-+]?\d+$/.test(raw)) return NaN;
+                    return Number(raw);
+                }
+
+                function submitAnswer() {
+                    if (!sessionActive || !current) return;
+                    const val = parseInputValue();
+                    const now = performance.now();
+                    const elapsed = now - problemStartMs;
+                    if (val === null) return; // no input yet
+                    if (Number.isNaN(val)) {
+                        UI.setFeedback('wrong', 'Please enter a whole number.');
+                        return;
+                    }
+                    const isCorrect = val === current.ans;
+                    if (timer) timer.stop();
+                    handleResult(isCorrect, isCorrect ? 'correct' : 'wrong', val, elapsed);
+                }
+
+                function handleResult(isCorrect, type, userAns, elapsedMs) {
+                    if (type === 'timeout') {
+                        UI.setFeedback('timeout', `⏱ Time's up! Answer: ${current.ans}`);
+                        if (dom.lastResult) dom.lastResult.textContent = 'Timeout';
+                        stats.recordAttempt(current.op, false, 0, current, 'timeout');
+                        if (settings.prefs.sound) beepBad();
+                    } else if (isCorrect) {
+                        UI.setFeedback('correct', '✔ Correct!');
+                        if (dom.lastResult) dom.lastResult.textContent = 'Correct';
+                        stats.recordAttempt(current.op, true, elapsedMs, current, userAns);
+                        if (settings.prefs.sound) beepOK();
+                    } else {
+                        UI.setFeedback('wrong', `✖ ${userAns} is incorrect. Answer: ${current.ans}`);
+                        if (dom.lastResult) dom.lastResult.textContent = 'Wrong';
+                        stats.recordAttempt(current.op, false, elapsedMs, current, userAns);
+                        if (settings.prefs.sound) beepBad();
+                    }
+                    UI.updateDashboard(stats);
+                    UI.renderInsights(stats);
+                    UI.renderSuggestions(settings, stats);
+
+                    if (!sessionActive) return;
+                    // Always auto-next in fun mode
+                    setTimeout(nextProblem, 320);
+
+                    maybeSuggestDifficulty();
+                }
+
+                function nextProblem() {
+                    if (!sessionActive) return;
+                    if (dom.next) dom.next.disabled = true; dom.submit.disabled = false;
+                    generateAndRenderProblem();
+                }
+
+                function onKey(e) {
+                    const tag = (e.target && (e.target.tagName || '').toLowerCase()) || '';
+                    if (e.key === 'Enter') {
+                        if (tag !== 'input') e.preventDefault();
+                        submitAnswer();
+                    } else if (e.code === 'Space') {
+                        // Space no longer used in fun mode
+                        e.preventDefault();
+                    } else if (e.key.toLowerCase() === 'e') {
+                        e.preventDefault();
+                        openSettings();
+                    } else if (e.key.toLowerCase() === 's') {
+                        e.preventDefault();
+                        if (!sessionActive) startSession(); else stopSession();
+                    } else if (e.key.toLowerCase() === 'h') {
+                        e.preventDefault();
+                        settings.prefs.contrast = !settings.prefs.contrast; SettingsManager.save();
+                        SettingsManager.applyPrefs(settings.prefs);
+                    } else if (e.key.toLowerCase() === 'l') {
+                        e.preventDefault();
+                        settings.prefs.large = !settings.prefs.large; SettingsManager.save();
+                        SettingsManager.applyPrefs(settings.prefs);
+                    }
+                }
+
+                function openSettings() { /* inline mode: noop */ }
+                function closeSettings() { /* inline mode: noop */ }
+
+                function resetStats() {
+                    stats.reset();
+                    UI.updateDashboard(stats);
+                    UI.renderInsights(stats);
+                    UI.renderSuggestions(settings, stats);
+                    UI.renderSessionSummary(stats);
+                }
+
+                function maybeSuggestDifficulty() { /* feature removed */ }
+
+                function ensureAudio() {
+                    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) { audioCtx = null; }
+                }
+
+                // Public API
+                return { init };
+            })();
+
+            // Initialize
+            GameController.init();
+        })();
+    </script>
+</body>
+
+</html>
